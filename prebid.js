@@ -1,66 +1,86 @@
 /**
  * Prebid.js integration hosted via GitHub
- * - Supports buvis_lt_300x600_sidebar_1 and _2
  * - Shared SSP config
  * - Detects divs on page
  * - Renders ads dynamically
  */
 
-var pbjs = window.pbjs = window.pbjs || {};
+var pbjs = pbjs || {};
 pbjs.que = pbjs.que || [];
 
-const allAdUnits = [
-  'buvis_lt_300x600_sidebar_1',
-  'buvis_lt_300x600_sidebar_2'
+const commonBidders = [
+  { bidder: 'adform', params: { mid: 1827042 } },
+  { bidder: 'smartadserver', params: {
+      domain: 'prg.smartadserver.com',
+      siteId: 644690,
+      pageId: 1947881,
+      formatId: 85325
+    }
+  },
+  { bidder: 'openx', params: {
+      delDomain: 'setupad-d.openx.net',
+      unit: '560637348'
+    }
+  },
+  { bidder: 'luponmedia', params: {
+      siteId: '13698',
+      keyId: 'uid_buvislt-sa'
+    }
+  },
+  { bidder: 'adaptmx', params: {
+      tagId: 'c2V0dXBhZC1yb24udmVydGljYWwuYnV2aXMubHQ'
+    }
+  },
+  { bidder: 'rtbhouse', params: {
+      region: 'prebid-eu',
+      publisherId: 'd2380d6f45eaac2d22'
+    }
+  }
 ];
 
-function getPresentAdUnits() {
-  return allAdUnits.filter(unitCode => document.getElementById(unitCode));
-}
+const adUnits = [
+  {
+    code: 'buvis_lt_300x600_sidebar_1',
+    mediaTypes: { banner: { sizes: [[300, 600]] } },
+    bids: commonBidders
+  },
+  {
+    code: 'buvis_lt_300x600_sidebar_2',
+    mediaTypes: { banner: { sizes: [[300, 600]] } },
+    bids: commonBidders
+  },
+  {
+    code: 'buvis_lt_300x250_mobile_article_1',
+    mediaTypes: { banner: { sizes: [[300, 250]] } },
+    bids: commonBidders
+  },
+  {
+    code: 'buvis_lt_300x250_mobile_article_2',
+    mediaTypes: { banner: { sizes: [[300, 250]] } },
+    bids: commonBidders
+  },
+  {
+    code: 'buvis_lt_300x250_article_left_1',
+    mediaTypes: { banner: { sizes: [[300, 250]] } },
+    bids: commonBidders
+  },
+  {
+    code: 'buvis_lt_300x250_article_right_1',
+    mediaTypes: { banner: { sizes: [[300, 250]] } },
+    bids: commonBidders
+  }
+];
 
-function buildAdUnit(code) {
-  return {
-    code: code,
-    mediaTypes: {
-      banner: { sizes: [[300, 600]] }
-    },
-    bids: [
-      { bidder: 'adform', params: { mid: 1827042 } },
-      { bidder: 'smartadserver', params: {
-          domain: 'prg.smartadserver.com',
-          siteId: 644690,
-          pageId: 1947881,
-          formatId: 85325
-      } },
-      { bidder: 'openx', params: {
-          delDomain: 'setupad-d.openx.net',
-          unit: '560637348'
-      } },
-      { bidder: 'luponmedia', params: {
-          siteId: '13698',
-          keyId: 'uid_buvislt-sa'
-      } },
-      { bidder: 'adaptmx', params: {
-          tagId: 'c2V0dXBhZC1yb24udmVydGljYWwuYnV2aXMubHQ'
-      } },
-      { bidder: 'rtbhouse', params: {
-          region: 'prebid-eu',
-          publisherId: 'd2380d6f45eaac2c7d22'
-      } }
-    ]
-  };
-}
-
+// --- Config ---
 pbjs.que.push(function () {
-  const activeAdUnits = getPresentAdUnits().map(buildAdUnit);
-  if (activeAdUnits.length === 0) return;
-
   pbjs.setConfig({
     debug: true,
     bidderTimeout: 1500,
     currency: {
       adServerCurrency: 'EUR',
-      defaultRates: { EUR: { EUR: 1 } }
+      defaultRates: {
+        EUR: { EUR: 1 }
+      }
     },
     consentManagement: {
       gdpr: {
@@ -81,72 +101,139 @@ pbjs.que.push(function () {
   });
 
   setupGA4Tracking();
-  pbjs.addAdUnits(activeAdUnits);
+  refreshAd();
+});
 
-  pbjs.requestBids({
-    adUnits: activeAdUnits,
-    bidsBackHandler: function () {
-      activeAdUnits.forEach(unit => {
-        const winningBid = pbjs.getHighestCpmBids(unit.code)[0];
-        if (winningBid) renderAd(unit.code, winningBid.adId);
+// --- Helper: render ad in iframe ---
+function createCleanIframe(adUnitCode) {
+  const container = document.getElementById(adUnitCode);
+  if (!container) {
+    console.warn('No container found for ad unit:', adUnitCode);
+    return null;
+  }
+
+  // Remove existing iframe
+  const oldIframe = container.querySelector('iframe');
+  if (oldIframe) oldIframe.remove();
+
+  const iframe = document.createElement('iframe');
+  iframe.className = 'ad-frame';
+  iframe.width = container.offsetWidth || 300;
+  iframe.height = container.offsetHeight || 250;
+  iframe.frameBorder = 0;
+  iframe.scrolling = 'no';
+
+  container.appendChild(iframe);
+  return iframe;
+}
+
+function renderAdInCleanIframe(adUnitCode, adId) {
+  const iframe = createCleanIframe(adUnitCode);
+  if (!iframe) return;
+
+  const doc = iframe.contentWindow.document;
+
+  doc.open();
+  doc.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        html, body {
+          margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent;
+        }
+        #ad-slot {
+          width: 100%; height: 100%;
+        }
+      </style>
+    </head>
+    <body>
+      <div id="ad-slot"></div>
+    </body>
+    </html>
+  `);
+  doc.close();
+
+  setTimeout(() => {
+    try {
+      pbjs.renderAd(doc, adId);
+      setTimeout(() => {
+        const style = doc.createElement('style');
+        style.innerHTML = `
+          * { margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+          body { display: flex !important; justify-content: center !important; align-items: center !important; }
+          img, iframe, div { margin: 0 auto !important; display: block !important; float: none !important; }
+        `;
+        doc.head.appendChild(style);
+      }, 200);
+    } catch (e) {
+      console.error("Render failed:", e);
+    }
+  }, 50);
+}
+
+// --- Request bids and render ---
+function refreshAd() {
+  pbjs.que.push(function () {
+    pbjs.removeAdUnits();
+    pbjs.addAdUnits(adUnits);
+
+    pbjs.requestBids({
+      adUnits: adUnits,
+      bidsBackHandler: function () {
+        adUnits.forEach(function(adUnit) {
+          const winningBid = pbjs.getHighestCpmBids(adUnit.code)[0];
+          if (winningBid) {
+            renderAdInCleanIframe(adUnit.code, winningBid.adId);
+            console.log(`Ad rendered for ${adUnit.code}: bidder=${winningBid.bidder}, CPM=${winningBid.cpm} ${winningBid.currency}`);
+          } else {
+            console.warn(`No winning bid for ad unit: ${adUnit.code}`);
+          }
+        });
+      }
+    });
+  });
+}
+
+// --- GA4 Event tracking ---
+function setupGA4Tracking() {
+  pbjs.onEvent('bidResponse', function (bid) {
+    if (typeof gtag === 'function') {
+      gtag('event', 'bid_response', {
+        bidder: bid.bidder,
+        ad_unit: bid.adUnitCode,
+        cpm: bid.cpm,
+        response_time: bid.timeToRespond
       });
     }
   });
-});
-
-function renderAd(divId, adId) {
-  const container = document.getElementById(divId);
-  if (!container) return;
-
-  const iframe = document.createElement('iframe');
-  iframe.width = 300;
-  iframe.height = 600;
-  iframe.style.border = 'none';
-  iframe.scrolling = 'no';
-  iframe.id = `${divId}_iframe`;
-
-  container.innerHTML = '';
-  container.appendChild(iframe);
-
-  const doc = iframe.contentWindow.document;
-  doc.open();
-  doc.write(`<!DOCTYPE html><html><body style='margin:0;padding:0;'><div id="ad-slot"></div></body></html>`);
-  doc.close();
-
-  pbjs.renderAd(doc, adId);
-}
-
-function setupGA4Tracking() {
-  pbjs.onEvent('bidResponse', function (bid) {
-    gtag('event', 'bid_response', {
-      bidder: bid.bidder,
-      cpm: bid.cpm,
-      currency: bid.currency,
-      adUnitCode: bid.adUnitCode,
-      responseTime: bid.timeToRespond
-    });
-  });
 
   pbjs.onEvent('bidWon', function (bid) {
-    gtag('event', 'bid_won', {
-      bidder: bid.bidder,
-      cpm: bid.cpm,
-      adUnitCode: bid.adUnitCode
-    });
+    if (typeof gtag === 'function') {
+      gtag('event', 'bid_won', {
+        bidder: bid.bidder,
+        ad_unit: bid.adUnitCode,
+        cpm: bid.cpm
+      });
+    }
   });
 
   pbjs.onEvent('bidTimeout', function (bidders) {
-    bidders.forEach(function (b) {
-      gtag('event', 'bid_timeout', {
-        bidder: b.bidder
+    if (typeof gtag === 'function') {
+      bidders.forEach(function (b) {
+        gtag('event', 'bid_timeout', {
+          bidder: b.bidder
+        });
       });
-    });
+    }
   });
 
   pbjs.onEvent('auctionEnd', function (data) {
-    gtag('event', 'auction_end', {
-      timestamp: Date.now(),
-      adUnits: data.length
-    });
+    if (typeof gtag === 'function') {
+      gtag('event', 'auction_end', {
+        timestamp: Date.now(),
+        adUnits: data.length
+      });
+    }
   });
 }
