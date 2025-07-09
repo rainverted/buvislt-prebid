@@ -102,6 +102,9 @@ pbjs.que.push(function () {
 
   setupGA4Tracking();
   refreshAd();
+
+  //Refresh ads every 5 minutes automatically
+  setInterval(refreshAd, 300000);
 });
 
 // --- Helper: render ad in iframe ---
