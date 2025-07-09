@@ -8,66 +8,90 @@
 var pbjs = pbjs || {};
 pbjs.que = pbjs.que || [];
 
-const commonBidders = [
-  { bidder: 'adform', params: { mid: 1827042 } },
-  { bidder: 'smartadserver', params: {
-      domain: 'prg.smartadserver.com',
-      siteId: 644690,
-      pageId: 1947881,
-      formatId: 85325
-    }
-  },
-  { bidder: 'openx', params: {
-      delDomain: 'setupad-d.openx.net',
-      unit: '560637348'
-    }
-  },
-  { bidder: 'luponmedia', params: {
-      siteId: '13698',
-      keyId: 'uid_buvislt-sa'
-    }
-  },
-  { bidder: 'adaptmx', params: {
-      tagId: 'c2V0dXBhZC1yb24udmVydGljYWwuYnV2aXMubHQ'
-    }
-  },
-  { bidder: 'rtbhouse', params: {
-      region: 'prebid-eu',
-      publisherId: 'd2380d6f45eaac2d22'
-    }
-  }
-];
-
 const adUnits = [
   {
     code: 'buvis_lt_300x600_sidebar_1',
     mediaTypes: { banner: { sizes: [[300, 600]] } },
-    bids: commonBidders
+    bids: [
+      { bidder: 'adform', params: { mid: 1827042 } },
+      { bidder: 'smartadserver', params: {
+        domain: 'prg.smartadserver.com', siteId: 644690, pageId: 1947881, formatId: 85325
+      }},
+      { bidder: 'openx', params: { delDomain: 'setupad-d.openx.net', unit: '560637348' }},
+      { bidder: 'luponmedia', params: { siteId: '13698', keyId: 'uid_buvislt-sa' }},
+      { bidder: 'adaptmx', params: { tagId: 'c2V0dXBhZC1yb24uY29t' }},
+      { bidder: 'rtbhouse', params: { region: 'prebid-eu', publisherId: 'd2380d6f45eaac2c7d22' }}
+    ]
   },
   {
     code: 'buvis_lt_300x600_sidebar_2',
     mediaTypes: { banner: { sizes: [[300, 600]] } },
-    bids: commonBidders
+    bids: [
+      { bidder: 'adform', params: { mid: 2147920 } },
+      { bidder: 'smartadserver', params: {
+        domain: 'prg.smartadserver.com', siteId: 644690, pageId: 1947881, formatId: 85325
+      }},
+      { bidder: 'openx', params: { delDomain: 'setupad-d.openx.net', unit: '560637348' }},
+      { bidder: 'luponmedia', params: { siteId: '13698', keyId: 'uid_buvislt-sa' }},
+      { bidder: 'adaptmx', params: { tagId: 'c2V0dXBhZC1yb24uY29t' }},
+      { bidder: 'rtbhouse', params: { region: 'prebid-eu', publisherId: 'd2380d6f45eaac2c7d23' }}
+    ]
   },
   {
     code: 'buvis_lt_300x250_mobile_article_1',
     mediaTypes: { banner: { sizes: [[300, 250]] } },
-    bids: commonBidders
+    bids: [
+      { bidder: 'adform', params: { mid: 1827044 } },
+      { bidder: 'smartadserver', params: {
+        domain: 'prg.smartadserver.com', siteId: 644690, pageId: 1947881, formatId: 84779
+      }},
+      { bidder: 'openx', params: { delDomain: 'setupad-d.openx.net', unit: '560637352' }},
+      { bidder: 'luponmedia', params: { siteId: '13698', keyId: 'uid_buvislt-sa' }},
+      { bidder: 'adaptmx', params: { tagId: 'c2V0dXBhZC1yb24uY29t' }},
+      { bidder: 'rtbhouse', params: { region: 'prebid-eu', publisherId: 'd2380d6f45eaac2c7d24' }}
+    ]
   },
   {
     code: 'buvis_lt_300x250_mobile_article_2',
     mediaTypes: { banner: { sizes: [[300, 250]] } },
-    bids: commonBidders
+    bids: [
+      { bidder: 'adform', params: { mid: 2147917 } },
+      { bidder: 'smartadserver', params: {
+        domain: 'prg.smartadserver.com', siteId: 644690, pageId: 1947881, formatId: 84779
+      }},
+      { bidder: 'openx', params: { delDomain: 'setupad-d.openx.net', unit: '560637352' }},
+      { bidder: 'luponmedia', params: { siteId: '13698', keyId: 'uid_buvislt-sa' }},
+      { bidder: 'adaptmx', params: { tagId: 'c2V0dXBhZC1yb24uY29t' }},
+      { bidder: 'rtbhouse', params: { region: 'prebid-eu', publisherId: 'd2380d6f45eaac2c7d25' }}
+    ]
   },
   {
     code: 'buvis_lt_300x250_article_left_1',
     mediaTypes: { banner: { sizes: [[300, 250]] } },
-    bids: commonBidders
+    bids: [
+      { bidder: 'adform', params: { mid: 2147921 } },
+      { bidder: 'smartadserver', params: {
+        domain: 'prg.smartadserver.com', siteId: 644690, pageId: 1947881, formatId: 84779
+      }},
+      { bidder: 'openx', params: { delDomain: 'setupad-d.openx.net', unit: '560637352' }},
+      { bidder: 'luponmedia', params: { siteId: '13698', keyId: 'uid_buvislt-sa' }},
+      { bidder: 'adaptmx', params: { tagId: 'c2V0dXBhZC1yb24uY29t' }},
+      { bidder: 'rtbhouse', params: { region: 'prebid-eu', publisherId: 'd2380d6f45eaac2c7d26' }}
+    ]
   },
   {
     code: 'buvis_lt_300x250_article_right_1',
     mediaTypes: { banner: { sizes: [[300, 250]] } },
-    bids: commonBidders
+    bids: [
+      { bidder: 'adform', params: { mid: 2147923 } },
+      { bidder: 'smartadserver', params: {
+        domain: 'prg.smartadserver.com', siteId: 644690, pageId: 1947881, formatId: 84779
+      }},
+      { bidder: 'openx', params: { delDomain: 'setupad-d.openx.net', unit: '560637352' }},
+      { bidder: 'luponmedia', params: { siteId: '13698', keyId: 'uid_buvislt-sa' }},
+      { bidder: 'adaptmx', params: { tagId: 'c2V0dXBhZC1yb24uY29t' }},
+      { bidder: 'rtbhouse', params: { region: 'prebid-eu', publisherId: 'd2380d6f45eaac2c7d27' }}
+    ]
   }
 ];
 
