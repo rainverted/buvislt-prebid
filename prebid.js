@@ -95,6 +95,7 @@ const adUnits = [
   }
 ];
 
+
 // --- Config ---
 pbjs.que.push(function () {
   pbjs.setConfig({
@@ -123,6 +124,7 @@ pbjs.que.push(function () {
       ]
     }
   });
+  pbjs.addAdUnits(adUnits);
 
   setupGA4Tracking();
   refreshAd();
@@ -202,13 +204,12 @@ function renderAdInCleanIframe(adUnitCode, adId) {
 // --- Request bids and render ---
 function refreshAd() {
   pbjs.que.push(function () {
-    pbjs.removeAdUnits();
-    pbjs.addAdUnits(adUnits);
-
     pbjs.requestBids({
       adUnits: adUnits,
       bidsBackHandler: function () {
         adUnits.forEach(function(adUnit) {
+           const bids = pbjs.getHighestCpmBids(adUnit.code);
+          console.log(adUnit.code, 'bids:', bids);
           const winningBid = pbjs.getHighestCpmBids(adUnit.code)[0];
           if (winningBid) {
             renderAdInCleanIframe(adUnit.code, winningBid.adId);
